@@ -83,38 +83,7 @@ python main.py --sql "SELECT title, genres FROM movies WHERE genres LIKE '%Horro
 
 ---
 
-## Project Structure
-
-```
-recom/
-├── app.py                # Streamlit web UI
-├── main.py               # CLI entry point
-├── requirements.txt
-├── data/
-│   ├── ml-latest-small/  # MovieLens dataset (auto-downloaded)
-│   ├── movies.db         # SQLite database
-│   └── svd_model.pkl     # Serialized trained model
-└── src/
-    ├── data_loader.py    # Download, preprocess, normalize ratings
-    ├── database.py       # SQLite schema, bulk load, query helpers
-    ├── model.py          # SVD training, prediction, serialization
-    ├── evaluate.py       # RMSE, MAE, Precision@K, Recall@K
-    └── recommender.py    # High-level orchestration class
-```
-
 ---
-
-## Key Technical Decisions
-
-| Decision | Rationale |
-|---|---|
-| SVD (Truncated) via scikit-learn | Scales to large sparse matrices; no C compiler required unlike Surprise |
-| Mean-centering ratings per user | Removes systematic rating bias before matrix decomposition |
-| SQLite + SQLAlchemy Core | Portable, zero-config database; parameterized queries prevent SQL injection |
-| `@st.cache_resource` for model | Keeps 51 MB model object in memory across Streamlit reruns without re-serializing |
-| Precision@K / Recall@K | More informative than RMSE alone for ranking-quality evaluation |
-| `st.download_button` | Lets users export any result set as a CSV without leaving the browser |
-
 ## Images
 
 <img width="1600" height="900" alt="Screenshot (65)" src="https://github.com/user-attachments/assets/04bd45c5-6959-47c0-8441-70ffd042bcd6" />
