@@ -114,3 +114,17 @@ recom/
 | `@st.cache_resource` for model | Keeps 51 MB model object in memory across Streamlit reruns without re-serializing |
 | Precision@K / Recall@K | More informative than RMSE alone for ranking-quality evaluation |
 | `st.download_button` | Lets users export any result set as a CSV without leaving the browser |
+
+## Images
+
+<img width="1600" height="900" alt="Screenshot (65)" src="https://github.com/user-attachments/assets/04bd45c5-6959-47c0-8441-70ffd042bcd6" />
+<img width="1600" height="900" alt="Screenshot (66)" src="https://github.com/user-attachments/assets/4d5c1f4b-136f-4d53-854b-53823e4397bd" />
+<img width="1600" height="900" alt="Screenshot (67)" src="https://github.com/user-attachments/assets/4927a6fc-347f-4c9f-b123-7ecf004c4575" />
+<img width="1600" height="900" alt="Screenshot (68)" src="https://github.com/user-attachments/assets/194b675e-bd72-4249-8f49-99e63999607b" />
+<img width="1600" height="900" alt="Screenshot (69)" src="https://github.com/user-attachments/assets/809336e4-c21f-4027-9dc8-96f198a61a38" />
+<img width="1600" height="900" alt="Screenshot (70)" src="https://github.com/user-attachments/assets/5909479b-3d83-4808-9276-8a235e451df8" />
+<img width="1600" height="900" alt="Screenshot (71)" src="https://github.com/user-attachments/assets/64afc01f-def3-414c-babc-935c74020b33" />
+<img width="1600" height="900" alt="Screenshot (72)" src="https://github.com/user-attachments/assets/03d93229-f913-4a65-a4b3-773652712456" />
+<img width="1600" height="900" alt="Screenshot (73)" src="https://github.com/user-attachments/assets/d4599319-e608-4a70-9682-6a099eb51c83" />
+
+
