@@ -1,18 +1,34 @@
-# Movie Recommendation System
+# CineMatch — Movie Recommendation System
 
-A personalized movie recommendation system using **collaborative filtering** (SVD matrix factorization), backed by a **SQLite** database and evaluated with **precision** and **recall** metrics.
+A personalized movie recommendation system with an interactive web UI, powered by **SVD collaborative filtering**, a **SQLite** database, and evaluated with **precision** and **recall** metrics.
 
-**Stack:** Python · Pandas · Scikit-learn · Surprise · SQLAlchemy · SQLite
+**Stack:** Python · Pandas · Scikit-learn · SQLAlchemy · SQLite · Streamlit · Plotly
+
+---
+
+## Features
+
+- **Personalized Recommendations** — Enter any user ID and get a ranked list of movies predicted to match their taste, with a visual rating bar for each result
+- **Download Results as CSV** — Every table in the app (recommendations, browsing results, user history) has a one-click CSV export button
+- **Model Performance Dashboard** — Visual evaluation report with RMSE, MAE, Precision@10, and Recall@10 metrics, displayed as metric cards and an interactive bar chart
+- **Browse by Genre** — Filter the full 9,000-movie catalogue by genre (Action, Sci-Fi, Drama, etc.) and see results instantly
+- **All-Time Top Rated** — View the highest community-rated movies, filtered to only include films with at least 50 ratings
+- **User History Explorer** — Look up any user's full rating history with a Plotly histogram showing how they distribute their scores
+- **Taste Profile** — Automatically analyzes a user's genre preferences: favorite genre, most-watched genre, avg rating per genre (color-coded bar chart), and a rater personality label (generous / balanced / harsh critic)
+- **Raw SQL Interface** — Query the SQLite database directly from the command line for custom lookups
+- **Automatic Data Download** — The MovieLens dataset downloads automatically on first run; no manual setup needed
+- **Cached Model Loading** — The trained model is serialized to disk and reloaded instantly on subsequent runs — no retraining required
 
 ---
 
 ## How It Works
 
-1. **Data** — Downloads the [MovieLens ml-latest-small](https://grouplens.org/datasets/movielens/) dataset (~100k ratings, 9k movies, 600 users).
-2. **Preprocessing** — Ratings are mean-centered per user to reduce bias from users who rate everything high or low.
-3. **Model** — An SVD model (via the Surprise library) factorizes the user-item rating matrix into latent factor vectors that capture hidden preferences.
-4. **Database** — Movies, ratings, and recommendations are stored in a SQLite database queried through SQLAlchemy.
-5. **Evaluation** — Performance is measured with RMSE, MAE, Precision@K, and Recall@K.
+1. **Data** — Downloads the [MovieLens ml-latest-small](https://grouplens.org/datasets/movielens/) dataset (~100k ratings, 9k movies, 600 users) automatically on first run.
+2. **Preprocessing** — Ratings are mean-centered per user to remove bias from users who consistently rate everything high or low.
+3. **Model** — Truncated SVD (scikit-learn) factorizes the 610 × 9,000 user-item rating matrix into 100 latent dimensions that capture hidden taste patterns without any explicit movie features.
+4. **Database** — Movies, ratings, and generated recommendations are stored in a SQLite database and queried through SQLAlchemy with parameterized queries.
+5. **Evaluation** — Performance is measured with RMSE, MAE, Precision@K, and Recall@K on a held-out 20% test split.
+6. **UI** — A Streamlit web app provides an interactive interface with charts, downloadable tables, and real-time recommendations.
 
 ---
 
@@ -20,14 +36,24 @@ A personalized movie recommendation system using **collaborative filtering** (SV
 
 ```bash
 pip install -r requirements.txt
+
+# Download dataset, train model, initialize database (~30 seconds first time)
 python main.py --setup
 ```
 
-This downloads the dataset (~3 MB), trains the model, and initialises the database. Takes ~30 seconds on first run.
+---
+
+## Launch the Web UI
+
+```bash
+python -m streamlit run app.py
+```
+
+Opens at `http://localhost:8501`. The model loads from disk instantly after the first run.
 
 ---
 
-## Usage
+## CLI Usage
 
 ```bash
 # Get top-10 recommendations for user 42
@@ -36,7 +62,7 @@ python main.py --recommend 42
 # Get top-5 recommendations
 python main.py --recommend 42 --n 5
 
-# Evaluate model performance (RMSE, MAE, Precision@10, Recall@10)
+# Evaluate model (RMSE, MAE, Precision@10, Recall@10)
 python main.py --evaluate
 
 # Show a user's past ratings
@@ -48,11 +74,11 @@ python main.py --genre "Sci-Fi"
 # Show globally top-rated movies
 python main.py --top-rated
 
-# Predict a specific user's rating for a specific movie
+# Predict a user's rating for a specific movie
 python main.py --predict 42 1
 
-# Run a raw SQL query against the database
-python main.py --sql "SELECT title, avg_rating FROM movies JOIN ..."
+# Run a raw SQL query
+python main.py --sql "SELECT title, genres FROM movies WHERE genres LIKE '%Horror%' LIMIT 10"
 ```
 
 ---
@@ -61,10 +87,11 @@ python main.py --sql "SELECT title, avg_rating FROM movies JOIN ..."
 
 ```
 recom/
+├── app.py                # Streamlit web UI
 ├── main.py               # CLI entry point
 ├── requirements.txt
 ├── data/
-│   ├── ml-latest-small/  # MovieLens data (auto-downloaded)
+│   ├── ml-latest-small/  # MovieLens dataset (auto-downloaded)
 │   ├── movies.db         # SQLite database
 │   └── svd_model.pkl     # Serialized trained model
 └── src/
@@ -81,30 +108,9 @@ recom/
 
 | Decision | Rationale |
 |---|---|
-| SVD over user-based CF | Scales to large sparse matrices; handles cold-start better |
-| Mean-centering ratings | Removes per-user rating bias before computing cosine similarities |
-| SQLite + SQLAlchemy | Portable, zero-config database; parameterized queries prevent SQL injection |
-| Surprise library | Battle-tested CF algorithms with built-in cross-validation support |
-| Precision@K / Recall@K | More informative than RMSE alone for ranking quality |
-
----
-
-## Example Output
-
-```
-Top-10 recommendations for user 42:
- movieId                               title           genres  est_rating
-    1196  Star Wars: Ep. V - Empire Strikes Back  Action|Adventure|Sci-Fi       4.521
-     260        Star Wars: Ep. IV - A New Hope  Action|Adventure|Sci-Fi       4.498
-     ...
-
-========================================
-  MODEL EVALUATION REPORT
-========================================
-  RMSE              : 0.8731
-  MAE               : 0.6704
-  Precision@10      : 0.3812
-  Recall@10         : 0.2147
-  (liked threshold  : ≥ 3.5 stars)
-========================================
-```
+| SVD (Truncated) via scikit-learn | Scales to large sparse matrices; no C compiler required unlike Surprise |
+| Mean-centering ratings per user | Removes systematic rating bias before matrix decomposition |
+| SQLite + SQLAlchemy Core | Portable, zero-config database; parameterized queries prevent SQL injection |
+| `@st.cache_resource` for model | Keeps 51 MB model object in memory across Streamlit reruns without re-serializing |
+| Precision@K / Recall@K | More informative than RMSE alone for ranking-quality evaluation |
+| `st.download_button` | Lets users export any result set as a CSV without leaving the browser |

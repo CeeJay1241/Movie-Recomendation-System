@@ -113,10 +113,10 @@ def get_movies_by_genre(genre: str) -> pd.DataFrame:
 
 
 def get_user_ratings(user_id: int) -> pd.DataFrame:
-    """Return all ratings submitted by a user, joined with movie titles."""
+    """Return all ratings submitted by a user, joined with movie titles and genres."""
     return query(
         """
-        SELECT r.userId, r.movieId, m.title, r.rating, r.rating_norm
+        SELECT r.userId, r.movieId, m.title, m.genres, r.rating, r.rating_norm
         FROM   ratings r
         JOIN   movies  m ON m.movieId = r.movieId
         WHERE  r.userId = :uid

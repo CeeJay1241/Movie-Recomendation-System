@@ -1,0 +1,16 @@
+.claude/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+*.egg-info/
+
+# Data / model artifacts
+data/ml-latest-small/
+data/*.pkl
+
+# IDE
+.vscode/
