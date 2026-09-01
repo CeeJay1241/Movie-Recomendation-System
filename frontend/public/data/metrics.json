@@ -1,0 +1,1 @@
+{"rmse": 0.9405, "mae": 0.7289, "precision_at_k": 0.6036, "recall_at_k": 0.6498, "k": 10, "threshold": 3.5}
